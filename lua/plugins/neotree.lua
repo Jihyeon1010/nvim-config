@@ -57,14 +57,6 @@ return {
         open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
         open_files_using_relative_paths = false,
         sort_case_insensitive = false, -- used when sorting files and directories in the tree
-        sort_function = nil, -- use a custom function for sorting files and directories in the tree
-        -- sort_function = function (a,b)
-        --       if a.type == b.type then
-        --           return a.path > b.path
-        --       else
-        --           return a.type > b.type
-        --       end
-        --   end , -- this sorts files and directories descendantly
         source_selector = {
           winbar = true, -- enable source selector in the winbar
           statusline = false, -- enable source selector in the statusline
@@ -80,11 +72,6 @@ return {
           --                end    : |/     󰓩 bufname \/...
           --                center : |/   󰓩 bufname   \/...
           tabs_layout = "equal", -- start, end, center, equal, focus
-          --             start  : |/  a  \/  b  \/  c  \            |
-          --             end    : |            /  a  \/  b  \/  c  \|
-          --             center : |      /  a  \/  b  \/  c  \      |
-          --             equal  : |/    a    \/    b    \/    c    \|
-          --             active : |/  focused tab    \/  b  \/  c  \|
           truncation_character = "…", -- character to use when truncating the tab label
           tabs_min_width = nil, -- nil | int: if int padding is added based on `content_layout`
           tabs_max_width = nil, -- this will truncate text even if `text_trunc_to_fit = false`
@@ -400,7 +387,6 @@ return {
           },
         },
       })
-      vim.keymap.set("n", "<leader>e", "<Cmd>Neotree reveal<CR>")
     end,
   },
 }

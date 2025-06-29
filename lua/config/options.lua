@@ -4,11 +4,18 @@ local opt = vim.opt   -- Set options (global/buffer/windows-scoped)
 -- General
 opt.mouse = 'a'                       -- Enable mouse support
 opt.clipboard = 'unnamedplus'         -- Copy/paste to system clipboard
+opt.wrap = false
+opt.undofile = true
+opt.ignorecase = true
+opt.smartcase = true
 
 -- Neovim UI
 opt.number = true           -- Show line number
 opt.relativenumber = false   -- Show relative line number
 opt.signcolumn = 'yes'      -- Always show sign column
+opt.cursorline = true
+opt.splitright = true
+opt.splitbelow = true
 
 -- Tabs, indent
 opt.expandtab = true        -- Use spaces instead of tabs
