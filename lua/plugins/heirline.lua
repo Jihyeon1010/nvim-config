@@ -35,9 +35,9 @@ return {
       end,
       static = {
         mode_names = {
-          n = "  NORMAL", i = " INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
-          c = "COMMAND", s = "SELECT", S = "S-LINE", ["\19"] = "S-BLOCK",
-          R = "REPLACE", r = "REPLACE", ["!"] = "SHELL", t = "TERMINAL",
+          n = "  NORMAL", i = " INSERT", v = " VISUAL", V = " V-LINE", ["\22"] = "V-BLOCK",
+          c = "󰘳  COMMAND", s = "SELECT", S = "S-LINE", ["\19"] = "S-BLOCK",
+          R = "REPLACE", r = "REPLACE", ["!"] = "SHELL", t = " TERMINAL",
         },
       },
       provider = function(self)
