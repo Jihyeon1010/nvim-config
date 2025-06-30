@@ -1,91 +1,53 @@
--- lua/config/autocmds.lua
-
--- Create a group for clean organization
+-- lua/config/autocommands.lua
 local augroup = vim.api.nvim_create_augroup
+local autocmd = vim.api.nvim_create_autocmd
 
-local general = augroup("GeneralAutocmds", { clear = true })
+local general = augroup("General", { clear = true })
 
--- Remove trailing whitespace on save
-vim.api.nvim_create_autocmd("BufWritePre", {
+-- 🪟 Resize splits when window resized
+autocmd("VimResized", {
   group = general,
-  pattern = "*",
-  command = [[%s/\s\+$//e]],
+  command = "tabdo wincmd =",
 })
 
--- Highlight text on yank
-vim.api.nvim_create_autocmd("TextYankPost", {
+-- 📌 Highlight on yank
+autocmd("TextYankPost", {
   group = general,
-  pattern = "*",
   callback = function()
     vim.highlight.on_yank({ timeout = 200 })
   end,
 })
 
--- Reload file if changed outside
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
+-- 🧼 Format on save for supported filetypes
+autocmd("BufWritePre", {
   group = general,
-  pattern = "*",
-  command = "checktime",
-})
-
--- Resize splits when window size changes
-vim.api.nvim_create_autocmd("VimResized", {
-  group = general,
-  pattern = "*",
-  command = "tabdo wincmd =",
-})
-
--- Open help files in vertical splits
-vim.api.nvim_create_autocmd("FileType", {
-  group = general,
-  pattern = "help",
-  command = "wincmd L",
-})
-
--- Spell check and line wrap in markdown and gitcommit
-vim.api.nvim_create_autocmd("FileType", {
-  group = general,
-  pattern = { "markdown", "gitcommit" },
   callback = function()
-    vim.opt_local.wrap = true
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
+-- 📝 Set filetype-specific options
+autocmd("FileType", {
+  group = general,
+  pattern = { "markdown", "text", "gitcommit" },
+  callback = function()
     vim.opt_local.spell = true
+    vim.opt_local.wrap = true
   end,
 })
 
--- Use relative numbers in normal mode, absolute in insert mode
-vim.api.nvim_create_autocmd("InsertEnter", {
+-- 🧹 Trim trailing whitespace on save
+autocmd("BufWritePre", {
   group = general,
   callback = function()
-    vim.opt.relativenumber = false
+    local save = vim.fn.winsaveview()
+    vim.cmd([[silent! %s/\s\+$//e]])
+    vim.fn.winrestview(save)
   end,
 })
 
-vim.api.nvim_create_autocmd("InsertLeave", {
-  group = general,
-  callback = function()
-    vim.opt.relativenumber = true
-  end,
-})
-
--- Auto create missing directories before saving
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = general,
-  callback = function(event)
-    local dir = vim.fn.fnamemodify(event.match, ":p:h")
-    if vim.fn.isdirectory(dir) == 0 then
-      vim.fn.mkdir(dir, "p")
-    end
-  end,
-})
-
--- Auto disable paste mode when leaving insert
-vim.api.nvim_create_autocmd("InsertLeave", {
-  group = general,
-  command = "set nopaste",
-})
-
--- Remember last position when reopening file
-vim.api.nvim_create_autocmd("BufReadPost", {
+-- ⏪ Return to last cursor position
+autocmd("BufReadPost", {
   group = general,
   callback = function()
     local mark = vim.api.nvim_buf_get_mark(0, '"')
@@ -95,3 +57,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
   end,
 })
+
+-- 💾 Auto-create missing directories before saving
+autocmd("BufWritePre", {
+  group = general,
+  callback = function()
+    local dir = vim.fn.fnamemodify(vim.fn.expand("<afile>"), ":p:h")
+    if vim.fn.isdirectory(dir) == 0 then
+      vim.fn.mkdir(dir, "p")
+    end
+  end,
+})
+

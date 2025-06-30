@@ -8,6 +8,7 @@ opt.wrap = false
 opt.undofile = true
 opt.ignorecase = true
 opt.smartcase = true
+opt.laststatus = 3
 
 -- Neovim UI
 opt.number = true           -- Show line number

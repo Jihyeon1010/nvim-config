@@ -28,6 +28,12 @@ return {
       ["!"] = colors.red,
       t = colors.red,
     }
+
+    local get_mode_color = function()
+      local mode = vim.fn.mode():sub(1, 1) -- get short mode (e.g. 'n', 'i', etc.)
+      return mode_colors[mode] or colors.blue
+    end
+
     -- Vimode indicatior
     local ViMode = {
       init = function(self)
@@ -73,24 +79,19 @@ return {
       },
       update = { "DiagnosticChanged", "BufEnter" },
       provider = function()
-        local icons = Diagnostics.static
+        --local icons = Diagnostics.static
         local d = vim.diagnostic.count(0)
         local output = ""
-        if d[vim.diagnostic.severity.ERROR] then
-          output = output .. icons.error_icon .. d[vim.diagnostic.severity.ERROR] .. " "
-        end
-        if d[vim.diagnostic.severity.WARN] then
-          output = output .. icons.warn_icon .. d[vim.diagnostic.severity.WARN] .. " "
-        end
-        if d[vim.diagnostic.severity.INFO] then
-          output = output .. icons.info_icon .. d[vim.diagnostic.severity.INFO] .. " "
-        end
-        if d[vim.diagnostic.severity.HINT] then
-          output = output .. icons.hint_icon .. d[vim.diagnostic.severity.HINT]
-        end
+
+        output = output .. icons.error_icon .. (d[vim.diagnostic.severity.ERROR] or 0) .. " "
+        output = output .. icons.warn_icon .. (d[vim.diagnostic.severity.WARN] or 0) .. " "
+        output = output .. icons.info_icon .. (d[vim.diagnostic.severity.INFO] or 0) .. " "
+        output = output .. icons.hint_icon .. (d[vim.diagnostic.severity.HINT] or 0)
+
         return output
+
       end,
-      hl = { fg = colors.fg },
+      hl = { fg = require("tokyonight.colors").setup().fg },
     }
 
     local FileNameBlock = {
@@ -190,12 +191,11 @@ return {
     heirline.setup({
       statusline = {
         ViMode,
-        FileNameBlock,
-        Git,
-        utils.surround({ "", "" }, colors.blue, {
-          provider = " " .. vim.bo.filetype,
+        utils.surround({ "", " " }, get_mode_color, {
           hl = { fg = colors.bg },
         }),
+        FileNameBlock,
+        Git,
         Diagnostics,
         { provider = "%=" },
         LSPActive,
