@@ -35,9 +35,9 @@ return {
       end,
       static = {
         mode_names = {
-          n = "  NORMAL", i = " INSERT", v = " VISUAL", V = " V-LINE", ["\22"] = "V-BLOCK",
+          n = " NORMAL", i = " INSERT", v = " VISUAL", V = " V-LINE", ["\22"] = "V-BLOCK",
           c = "󰘳  COMMAND", s = "SELECT", S = "S-LINE", ["\19"] = "S-BLOCK",
-          R = "REPLACE", r = "REPLACE", ["!"] = "SHELL", t = " TERMINAL",
+          R = "REPLACE", r = "REPLACE", ["!"] = " SHELL", t = " TERMINAL",
         },
       },
       provider = function(self)
@@ -124,7 +124,7 @@ return {
     local FileFlags = {
       {
         condition = function() return vim.bo.modified end,
-        provider = " ●",
+        provider = "[+]",
         hl = { fg = colors.green },
       },
       {
@@ -134,7 +134,20 @@ return {
       },
     }
 
-    FileNameBlock = utils.insert(FileNameBlock, FileIcon, FileName, unpack(FileFlags))
+    local FileNameModifier = {
+      hl = function()
+        if vim.bo.modified then
+          return { fg = "cyan", bold = true, force = true }
+        end
+      end,
+    }
+
+    FileNameBlock = utils.insert(FileNameBlock,
+      FileIcon,
+      utils.insert(FileNameModifier, FileName),
+      FileFlags,
+      { provider = '%<'}
+    )
 
     local LSPActive = {
       condition = conditions.lsp_attached,
@@ -177,10 +190,13 @@ return {
     heirline.setup({
       statusline = {
         ViMode,
-        Git,
-        Diagnostics,
-        { provider = "%=" },
         FileNameBlock,
+        Git,
+        utils.surround({ "", "" }, colors.blue, {
+          provider = " " .. vim.bo.filetype,
+          hl = { fg = colors.bg },
+        }),
+        Diagnostics,
         { provider = "%=" },
         LSPActive,
         FileType,
