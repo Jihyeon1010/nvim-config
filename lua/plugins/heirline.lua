@@ -290,6 +290,14 @@ return {
         },
       }
 
+<<<<<<< HEAD
+=======
+      local DiagnosticsSeparator = {
+        provider = separators.right,
+        hl = { fg = colors.fg_gutter, bg = colors.bg_statusline },
+      }
+
+>>>>>>> origin/main
       local Ruler = {
         provider = " %7(%l/%3L%):%2c %P ",
         hl = { fg = colors.blue, bg = colors.bg_statusline },
