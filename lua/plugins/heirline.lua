@@ -17,14 +17,15 @@ return {
         right = " ",
         vertical = "│",
         slash = "/",
-        arrow_right = "➜",
-        arrow_left = "➜",
+        soft_right = "",
+        soft_left = "",
         circle = "●",
         diamond = "◆",
         triangle_right = "▶",
         triangle_left = "◀",
       }
 
+      -- Define mode colours
       local function get_mode_color()
         local mode_colors = {
           n = colors.blue or "#7aa2f7",
@@ -41,7 +42,7 @@ return {
           ["!"] = colors.red or "#f7768e",
           t = colors.green or "#9ece6a",
         }
-        return mode_colors[vim.fn.mode()] or colors.fg or "#c0caf5"
+        return mode_colors[vim.fn.mode()]
       end
 
       local ViMode = {
@@ -102,7 +103,7 @@ return {
       }
 
       local ModeSeparator = {
-        provider = separators.right, 
+        provider = separators.right,
         hl = function()
           return { fg = get_mode_color(), bg = colors.bg_statusline }
         end,
@@ -142,7 +143,7 @@ return {
           end
           return filename
         end,
-        hl = { fg = utils.get_highlight("Directory").fg, bold = true },
+        hl = { fg = utils.get_highlight("Directory").fg, bg = colors.bg_statusline, bold = true },
       }
 
       local FileFlags = {
@@ -150,7 +151,7 @@ return {
           condition = function()
             return vim.bo.modified
           end,
-          provider = "[+]",
+          provider = " [+]",
           hl = { fg = colors.green, bg = colors.bg_statusline },
         },
         {
@@ -165,7 +166,6 @@ return {
       local FileNameModifer = {
         hl = function()
           if vim.bo.modified then
-            -- use `force` because we need to override the child's hl foreground
             return { fg = "cyan", bold = true, force = true }
           end
         end,
@@ -178,29 +178,63 @@ return {
         { provider = "%< " }
       )
 
-      -- File section separator
       local FileSeparator = {
-        provider = separators.right,
-        hl = { fg = colors.bg_statusline, bg = colors.bg_statusline },
+        provider = separators.soft_right,
+        hl = { fg = colors.blue, bg = colors.bg_statusline, bold = true },
       }
 
-      local GitBranch = {
+      local Git = {
         condition = conditions.is_git_repo,
+
         init = function(self)
           self.status_dict = vim.b.gitsigns_status_dict
-          self.has_changes = self.status_dict and
-              (self.status_dict.added ~= 0 or self.status_dict.removed ~= 0 or self.status_dict.changed ~= 0)
+          self.has_changes = self.status_dict.added ~= 0 or self.status_dict.removed ~= 0 or
+              self.status_dict.changed ~= 0
         end,
-        provider = function(self)
-          return " " .. ((self.status_dict and self.status_dict.head) or "main") .. " "
-        end,
-        hl = { fg = colors.purple, bg = colors.bg_statusline, bold = true },
-      }
 
-      -- Git separator
-      local GitSeparator = {
-        provider = separators.right,
-        hl = { fg = colors.purple, bg = colors.bg_statusline },
+        hl = { fg = "orange" },
+
+
+        { -- git branch name
+          provider = function(self)
+            return " " .. self.status_dict.head
+          end,
+          hl = { bold = true }
+        },
+        -- You could handle delimiters, icons and counts similar to Diagnostics
+        {
+          condition = function(self)
+            return self.has_changes
+          end,
+          provider = "("
+        },
+        {
+          provider = function(self)
+            local count = self.status_dict.added or 0
+            return count > 0 and ("+" .. count)
+          end,
+          hl = { fg = "git_add" },
+        },
+        {
+          provider = function(self)
+            local count = self.status_dict.removed or 0
+            return count > 0 and ("-" .. count)
+          end,
+          hl = { fg = "git_del" },
+        },
+        {
+          provider = function(self)
+            local count = self.status_dict.changed or 0
+            return count > 0 and ("~" .. count)
+          end,
+          hl = { fg = "git_change" },
+        },
+        {
+          condition = function(self)
+            return self.has_changes
+          end,
+          provider = ")",
+        },
       }
 
       local LSPActive = {
@@ -211,20 +245,14 @@ return {
           for i, server in pairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
             table.insert(names, server.name)
           end
-          return " LSP:[" .. table.concat(names, ",") .. "] "
+          return " LSP:[" .. table.concat(names, ",") .. "] "
         end,
         hl = { fg = colors.green or "#9ece6a", bg = colors.bg_statusline or colors.bg or "#1a1b26", bold = true },
       }
 
-      -- LSP separator
-      local LSPSeparator = {
-        provider = separators.circle .. " ",
-        hl = { fg = colors.green or "#9ece6a", bg = colors.bg_statusline or colors.bg or "#1a1b26" },
-      }
-
       local Diagnostics = {
         static = {
-          error_icon = " ",
+          error_icon = "  ",
           warn_icon = " ",
           info_icon = " ",
           hint_icon = "󰌵 ",
@@ -262,11 +290,6 @@ return {
         },
       }
 
-      local DiagnosticsSeparator = {
-        provider = separators.right,
-        hl = { fg = colors.fg_gutter, bg = colors.bg_statusline },
-      }
-
       local Ruler = {
         provider = " %7(%l/%3L%):%2c %P ",
         hl = { fg = colors.blue, bg = colors.bg_statusline },
@@ -286,8 +309,8 @@ return {
       }
 
       local RulerSeparator = {
-        provider = separators.left .. " ",
-        hl = { fg = colors.bg_statusline, bg = colors.bg },
+        provider = separators.soft_left,
+        hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
 
       local DefaultStatusline = {
@@ -295,14 +318,13 @@ return {
         ModeSeparator,
         FileNameBlock,
         FileSeparator,
-        Diagnostics,
-        DiagnosticsSeparator,
-        GitBranch,
-        GitSeparator,
+        Git,
 
-        { provider = "%=" }, -- Right align
+        { provider = "%=" },
 
         LSPActive,
+        RulerSeparator,
+        Diagnostics,
         RulerSeparator,
         Ruler,
         ScrollBar,
