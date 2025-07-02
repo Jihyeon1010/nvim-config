@@ -102,7 +102,7 @@ return {
       }
 
       local ModeSeparator = {
-        provider = separators.right,
+        provider = separators.right, 
         hl = function()
           return { fg = get_mode_color(), bg = colors.bg_statusline }
         end,
@@ -126,10 +126,10 @@ return {
             { default = true })
         end,
         provider = function(self)
-          return self.icon and (self.icon .. " ")
+          return self.icon and (" UNIX  " .. self.icon .. " ")
         end,
         hl = function(self)
-          return { fg = self.icon_color }
+          return { fg = self.icon_color, bold = true }
         end
       }
 
@@ -142,7 +142,7 @@ return {
           end
           return filename
         end,
-        hl = { fg = utils.get_highlight("Directory").fg },
+        hl = { fg = utils.get_highlight("Directory").fg, bold = true },
       }
 
       local FileFlags = {
@@ -157,7 +157,7 @@ return {
           condition = function()
             return not vim.bo.modifiable or vim.bo.readonly
           end,
-          provider = "",
+          provider = "  ",
           hl = { fg = colors.orange, bg = colors.bg_statusline },
         },
       }
@@ -194,12 +194,12 @@ return {
         provider = function(self)
           return " " .. ((self.status_dict and self.status_dict.head) or "main") .. " "
         end,
-        hl = { fg = colors.purple or "#bb9af7", bg = colors.bg_statusline or colors.bg or "#1a1b26", bold = true },
+        hl = { fg = colors.purple, bg = colors.bg_statusline, bold = true },
       }
 
       -- Git separator
       local GitSeparator = {
-        provider = " ",
+        provider = separators.right,
         hl = { fg = colors.purple, bg = colors.bg_statusline },
       }
 
@@ -222,16 +222,61 @@ return {
         hl = { fg = colors.green or "#9ece6a", bg = colors.bg_statusline or colors.bg or "#1a1b26" },
       }
 
+      local Diagnostics = {
+        condition = conditions.has_diagnostics,
+        static = {
+          error_icon = " ",
+          warn_icon = " ",
+          info_icon = " ",
+          hint_icon = "󰌵 ",
+        },
+        init = function(self)
+          self.errors = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+          self.warnings = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+          self.hints = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.HINT })
+          self.info = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.INFO })
+        end,
+        update = { "DiagnosticChanged", "BufEnter" },
+        {
+          provider = function(self)
+            return self.errors > 0 and (self.error_icon .. self.errors .. " ")
+          end,
+          hl = { fg = colors.red },
+        },
+        {
+          provider = function(self)
+            return self.warnings > 0 and (self.warn_icon .. self.warnings .. " ")
+          end,
+          hl = { fg = colors.yellow },
+        },
+        {
+          provider = function(self)
+            return self.info > 0 and (self.info_icon .. self.info .. " ")
+          end,
+          hl = { fg = colors.cyan },
+        },
+        {
+          provider = function(self)
+            return self.hints > 0 and (self.hint_icon .. self.hints .. " ")
+          end,
+          hl = { fg = colors.teal },
+        },
+      }
+
+      local DiagnosticsSeparator = {
+        condition = conditions.has_diagnostics,
+        provider = separators.right,
+        hl = { fg = colors.fg_gutter, bg = colors.bg_statusline },
+      }
+
       local Ruler = {
         provider = " %7(%l/%3L%):%2c %P ",
-        hl = { fg = colors.bg, bg = colors.blue },
+        hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
 
       local ScrollBar = {
         static = {
           sbar = { '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█' }
-          -- Another variant, because the more choice the better.
-          -- sbar = { '🭶', '🭷', '🭸', '🭹', '🭺', '🭻' }
         },
         provider = function(self)
           local curr_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -239,13 +284,12 @@ return {
           local i = math.floor((curr_line - 1) / lines * #self.sbar) + 1
           return string.rep(self.sbar[i], 2)
         end,
-        hl = { fg = colors.bg, bg = colors.blue },
+        hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
 
-      -- Ruler separator
       local RulerSeparator = {
         provider = separators.left .. " ",
-        hl = { fg = colors.blue, bg = colors.bg },
+        hl = { fg = colors.bg_statusline, bg = colors.bg },
       }
 
       local DefaultStatusline = {
@@ -253,6 +297,8 @@ return {
         ModeSeparator,
         FileNameBlock,
         FileSeparator,
+        Diagnostics,
+        DiagnosticsSeparator,
         GitBranch,
         GitSeparator,
 
