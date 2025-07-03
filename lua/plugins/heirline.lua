@@ -3,7 +3,7 @@ return {
   {
     "rebelot/heirline.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "SmiteshP/nvim-navic", },
     config = function()
       local heirline = require("heirline")
       local conditions = require("heirline.conditions")
@@ -44,6 +44,89 @@ return {
         }
         return mode_colors[vim.fn.mode()]
       end
+
+      -- NAVIC COMPONENT
+      local Navic = {
+        condition = function()
+          return require("nvim-navic").is_available()
+        end,
+        static = {
+          -- Create a type highlight map
+          type_hl = {
+            File = "Directory",
+            Module = "@namespace",
+            Namespace = "@namespace",
+            Package = "@namespace",
+            Class = "@type",
+            Method = "@method",
+            Property = "@method",
+            Field = "@field",
+            Constructor = "@constructor",
+            Enum = "@type",
+            Interface = "@type",
+            Function = "@function",
+            Variable = "@constant",
+            Constant = "@constant",
+            String = "@string",
+            Number = "@number",
+            Boolean = "@boolean",
+            Array = "@constant",
+            Object = "@type",
+            Key = "@type",
+            Null = "@type",
+            EnumMember = "@constant",
+            Struct = "@structure",
+            Event = "@type",
+            Operator = "@operator",
+            TypeParameter = "@parameter",
+          }
+        },
+        init = function(self)
+          local data = require("nvim-navic").get_data() or {}
+          local children = {}
+
+          -- Create navic component
+          for i, d in ipairs(data) do
+            local pos = self.enc(d.scope.start.line, d.scope.start.character, self.winnr)
+            local child = {
+              {
+                provider = d.icon,
+                hl = self.type_hl[d.type],
+              },
+              {
+                provider = d.name:gsub("%%", "%%%%"):gsub("%s*->%s*", ""),
+                hl = self.type_hl[d.type],
+
+                on_click = {
+                  -- Enable click to jump to symbol
+                  minwid = pos,
+                  callback = function(_, minwid)
+                    local line, col, winnr = self.dec(minwid)
+                    vim.api.nvim_win_set_cursor(vim.fn.win_getid(winnr), { line, col })
+                  end,
+                  name = "navic_click",
+                },
+              },
+            }
+            -- Add a separator if not the last item
+            if #data > 1 and i < #data then
+              table.insert(child, {
+                provider = " > ",
+                hl = { fg = colors.gray },
+              })
+            end
+            table.insert(children, child)
+          end
+
+          -- Store the table in self so that can be accessed by the children
+          self.child = self:new(children, 1)
+        end,
+        -- Evaluate the children containing navic components
+        provider = function(self)
+          return self.child:eval()
+        end,
+        hl = { fg = colors.gray },
+      }
 
       local ViMode = {
         init = function(self)
@@ -159,7 +242,7 @@ return {
             return not vim.bo.modifiable or vim.bo.readonly
           end,
           provider = "  ",
-          hl = { fg = colors.orange, bg = colors.bg_statusline },
+          hl = { fg = colors.red, bg = colors.bg_statusline },
         },
       }
 
@@ -313,6 +396,17 @@ return {
         hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
 
+      -- WINBAR COMPONENTS
+      local WinBarFileName = {
+        provider = function()
+          local filename = vim.api.nvim_buf_get_name(0)
+          local fname = vim.fn.fnamemodify(filename, ":t")
+          if fname == "" then return "" end
+          return fname
+        end,
+        hl = { fg = colors.blue, bold = true },
+      }
+
       local DefaultStatusline = {
         ViMode,
         ModeSeparator,
@@ -330,8 +424,15 @@ return {
         ScrollBar,
       }
 
+      local WinBar = {
+        WinBarFileName,
+        { provider = " " },
+        Navic,
+      }
+
       heirline.setup({
         statusline = DefaultStatusline,
+        winbar = WinBar,
         opts = {
           colors = colors,
         },
