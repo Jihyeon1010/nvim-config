@@ -8,6 +8,7 @@ return {
       local heirline = require("heirline")
       local conditions = require("heirline.conditions")
       local utils = require("heirline.utils")
+      local bit = require("bit")
 
       local colors = require("tokyonight.colors").setup()
 
@@ -79,8 +80,19 @@ return {
             Event = "@type",
             Operator = "@operator",
             TypeParameter = "@parameter",
-          }
+          },
+          -- encode and decode line/col/win into a single number
+          enc = function(line, col, winnr)
+            return bit.bor(bit.lshift(line, 16), bit.lshift(col, 6), winnr)
+          end,
+          dec = function(minwid)
+            local line = bit.rshift(minwid, 16)
+            local col = bit.band(bit.rshift(minwid, 6), 0x3FF)
+            local winnr = bit.band(minwid, 0x3F)
+            return line, col, winnr
+          end,
         },
+
         init = function(self)
           local data = require("nvim-navic").get_data() or {}
           local children = {}
