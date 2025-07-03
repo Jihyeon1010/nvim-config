@@ -192,12 +192,12 @@ return {
               self.status_dict.changed ~= 0
         end,
 
-        hl = { fg = "orange" },
+        hl = { fg = "green" },
 
 
         { -- git branch name
           provider = function(self)
-            return " " .. self.status_dict.head
+            return "  " .. self.status_dict.head
           end,
           hl = { bold = true }
         },
@@ -211,29 +211,29 @@ return {
         {
           provider = function(self)
             local count = self.status_dict.added or 0
-            return count > 0 and ("+" .. count)
+            return count > 0 and (" +" .. count)
           end,
-          hl = { fg = "git_add" },
+          hl = { fg = "#b8db87" },
         },
         {
           provider = function(self)
             local count = self.status_dict.removed or 0
-            return count > 0 and ("-" .. count)
+            return count > 0 and (" -" .. count)
           end,
-          hl = { fg = "git_del" },
+          hl = { fg = "#e26a75" },
         },
         {
           provider = function(self)
             local count = self.status_dict.changed or 0
-            return count > 0 and ("~" .. count)
+            return count > 0 and (" ~" .. count)
           end,
-          hl = { fg = "git_change" },
+          hl = { fg = "#7ca1f2" },
         },
         {
           condition = function(self)
             return self.has_changes
           end,
-          provider = ")",
+          provider = " )",
         },
       }
 
@@ -290,14 +290,6 @@ return {
         },
       }
 
-<<<<<<< HEAD
-=======
-      local DiagnosticsSeparator = {
-        provider = separators.right,
-        hl = { fg = colors.fg_gutter, bg = colors.bg_statusline },
-      }
-
->>>>>>> origin/main
       local Ruler = {
         provider = " %7(%l/%3L%):%2c %P ",
         hl = { fg = colors.blue, bg = colors.bg_statusline },
