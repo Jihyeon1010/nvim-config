@@ -52,7 +52,6 @@ return {
           return require("nvim-navic").is_available()
         end,
         static = {
-          -- Create a type highlight map
           type_hl = {
             File = "Directory",
             Module = "@namespace",
@@ -123,7 +122,7 @@ return {
             -- Add a separator if not the last item
             if #data > 1 and i < #data then
               table.insert(child, {
-                provider = " > ",
+                provider = "  ",
                 hl = { fg = colors.gray },
               })
             end
@@ -296,7 +295,6 @@ return {
           end,
           hl = { bold = true }
         },
-        -- You could handle delimiters, icons and counts similar to Diagnostics
         {
           condition = function(self)
             return self.has_changes
@@ -407,7 +405,6 @@ return {
         provider = separators.soft_left,
         hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
-
       -- WINBAR COMPONENTS
       local WinBarFileName = {
         provider = function()
