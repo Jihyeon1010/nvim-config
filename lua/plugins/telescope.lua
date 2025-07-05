@@ -1,9 +1,9 @@
 return {
-  'nvim-telescope/telescope.nvim', tag = '0.1.8',
+  'nvim-telescope/telescope.nvim',
+  tag = '0.1.8',
   dependencies = {
     'nvim-lua/plenary.nvim',
     "bi0ha2ard/telescope-ros.nvim",
-    
   },
   defaults = {
     mappings = {
@@ -18,7 +18,7 @@ return {
   },
   pickers = {
     -- Default configuration for builtin pickers goes here:
-    -- picker_name = {
+
     --   picker_config_key = value,
     --   ...
     -- }
