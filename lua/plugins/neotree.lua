@@ -1,35 +1,36 @@
 return {
-  -- {
-  --   "antosha417/nvim-lsp-file-operations",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --     "nvim-neo-tree/neo-tree.nvim",
-  --   },
-  --   config = function()
-  --     require("lsp-file-operations").setup()
-  --   end,
-  -- },
+  {
+    "antosha417/nvim-lsp-file-operations",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-neo-tree/neo-tree.nvim",
+    },
+    config = function()
+      require("lsp-file-operations").setup()
+    end,
+  },
+
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
+
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
-      -- {"3rd/image.nvim", opts = {}}, -- Optional image support in preview window: See `# Preview Mode` for more information
+
       {
-        "s1n7ax/nvim-window-picker", -- for open_with_window_picker keymaps
+        "s1n7ax/nvim-window-picker",
         version = "2.*",
+
         config = function()
           require("window-picker").setup({
             filter_rules = {
               include_current_win = false,
               autoselect_one = true,
-              -- filter using buffer options
+
               bo = {
-                -- if the file type is one of following, the window will be ignored
                 filetype = { "neo-tree", "neo-tree-popup", "notify" },
-                -- if the buffer type is one of following, the window will be ignored
                 buftype = { "terminal", "quickfix" },
               },
             },
@@ -37,6 +38,7 @@ return {
         end,
       },
     },
+
     lazy = false,
     config = function()
       vim.diagnostic.config({
@@ -49,18 +51,19 @@ return {
           },
         }
       })
+
       require("neo-tree").setup({
-        close_if_last_window = false,   -- Close Neo-tree if it is the last window left in the tab
-        popup_border_style = "rounded", -- or "" to use 'winborder' on Neovim v0.11+
+        close_if_last_window = true,
+        popup_border_style = "rounded", -- or "" 'winborder'
         enable_git_status = true,
         enable_diagnostics = true,
-        open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
+        open_files_do_not_replace_types = { "terminal", "trouble", "qf" },
         open_files_using_relative_paths = false,
-        sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
+        sort_case_insensitive = false, -- used when sorting files and directories in the tree
         source_selector = {
-          winbar = true,                                                   -- enable source selector in the winbar
-          statusline = false,                                              -- enable source selector in the statusline
-          show_scrolled_off_parent_node = false,                           -- show the parent node of the current node when scrolling off the top or bottom of the tree
+          winbar = true,
+          statusline = false,
+          show_scrolled_off_parent_node = false, -- show the parent node of the current node when scrolling off the top or bottom of the tree
 
           sources = {
             { source = "filesystem" },
@@ -75,16 +78,16 @@ return {
           truncation_character = "…", -- character to use when truncating the tab label
           tabs_min_width = nil, -- nil | int: if int padding is added based on `content_layout`
           tabs_max_width = nil, -- this will truncate text even if `text_trunc_to_fit = false`
-          padding = 0, -- can be int or table
+          padding = 1, -- can be int or table
           -- padding = { left = 2, right = 0 },
           -- separator = { left = "▏", right= "▕" },
           -- separator = { left = "/", right = "\\", override = nil },     -- |/  a  \/  b  \/  c  \...
           -- separator = { left = "/", right = "\\", override = "right" }, -- |/  a  \  b  \  c  \...
-          separator = { left = "/", right = "\\", override = "left" }, -- |/  a  /  b  /  c  /...
+          separator = { left = "/", right = "/", }, -- |/  a  /  b  /  c  /...
           -- separator = { left = "/", right = "\\", override = "active" },-- |/  a  / b:active \  c  \...
           -- separator = "|",                                              -- ||  a  |  b  |  c  |...
           separator_active = nil, -- set separators around the active tab. nil falls back to `source_selector.separator`
-          show_separator_on_edge = false,
+          show_separator_on_edge = true,
           --                       true  : |/    a    \/    b    \/    c    \|
           --                       false : |     a    \/    b    \/    c     |
           highlight_tab = "NeoTreeTabInactive",
@@ -115,7 +118,7 @@ return {
             folder_closed = "",
             folder_open = "",
             folder_empty = "",
-            provider = function(icon, node, state) -- default icon provider utilizes nvim-web-devicons if available
+            provider = function(icon, node, state) -- default icon provider utilises nvim-web-devicons i
               if node.type == "file" or node.type == "terminal" then
                 local success, web_devicons = pcall(require, "nvim-web-devicons")
                 local name = node.type == "terminal" and "terminal" or node.name
@@ -134,18 +137,16 @@ return {
             highlight = "NeoTreeModified",
           },
           name = {
-            trailing_slash = false,
+            trailing_slash = true,
             use_git_status_colors = true,
             highlight = "NeoTreeFileName",
           },
           git_status = {
             symbols = {
-              -- Change type
-              added = "", -- or "✚", but this is redundant info if you use git_status_colors on the name
-              modified = "", -- or "", but this is redundant info if you use git_status_colors on the name
-              deleted = "", -- this can only be used in the git_status source
-              renamed = "", -- this can only be used in the git_status source
-              -- Status type
+              added = "",
+              modified = "",
+              deleted = "",
+              renamed = "",
               untracked = "",
               ignored = "",
               unstaged = "",
@@ -153,7 +154,7 @@ return {
               conflict = "",
             },
           },
-          -- If you don't want to use these columns, you can set `enabled = false` for each of them individually
+
           file_size = {
             enabled = true,
             width = 12,          -- width of the column
@@ -189,7 +190,7 @@ return {
           mappings = {
             ["<space>"] = {
               "toggle_node",
-              nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
+              nowait = false,
             },
             ["<2-LeftMouse>"] = "open",
             ["<cr>"] = "open",
@@ -240,16 +241,6 @@ return {
             ["<"] = "prev_source",
             [">"] = "next_source",
             ["i"] = "show_file_details",
-            -- ["i"] = {
-            --   "show_file_details",
-            --   -- format strings of the timestamps shown for date created and last modified (see `:h os.date()`)
-            --   -- both options accept a string or a function that takes in the date in seconds and returns a string to display
-            --   -- config = {
-            --   --   created_format = "%Y-%m-%d %I:%M %p",
-            --   --   modified_format = "relative", -- equivalent to the line below
-            --   --   modified_format = function(seconds) return require('neo-tree.utils').relative_date(seconds) end
-            --   -- }
-            -- },
           },
         },
         nesting_rules = {},
