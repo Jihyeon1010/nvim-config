@@ -1,6 +1,3 @@
--- Gitsigns configuration for lazy.nvim
--- Save this as a separate file (e.g., ~/.config/nvim/lua/plugins/gitsigns.lua)
-
 return {
   'lewis6991/gitsigns.nvim',
   event = { "BufReadPre", "BufNewFile" }, -- Load on buffer open for performance
@@ -14,7 +11,7 @@ return {
         changedelete = { text = '~' },
         untracked    = { text = '┆' },
       },
-      signcolumn                   = true, -- Toggle with `:Gitsigns toggle_signs`
+      signcolumn                   = true,  -- Toggle with `:Gitsigns toggle_signs`
       numhl                        = false, -- Toggle with `:Gitsigns toggle_numhl`
       linehl                       = false, -- Toggle with `:Gitsigns toggle_linehl`
       word_diff                    = false, -- Toggle with `:Gitsigns toggle_word_diff`
@@ -33,7 +30,7 @@ return {
       current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
       sign_priority                = 6,
       update_debounce              = 100,
-      status_formatter             = nil, -- Use default
+      status_formatter             = nil,   -- Use default
       max_file_length              = 40000, -- Disable if file is longer than this (in lines)
       preview_config               = {
         -- Options passed to nvim_open_win
@@ -68,8 +65,10 @@ return {
         -- Actions
         map('n', '<leader>hs', gs.stage_hunk, { desc = "Stage hunk" })
         map('n', '<leader>hr', gs.reset_hunk, { desc = "Reset hunk" })
-        map('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = "Stage hunk" })
-        map('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = "Reset hunk" })
+        map('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end,
+          { desc = "Stage hunk" })
+        map('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line('.'), vim.fn.line('v') } end,
+          { desc = "Reset hunk" })
         map('n', '<leader>hS', gs.stage_buffer, { desc = "Stage buffer" })
         map('n', '<leader>hu', gs.undo_stage_hunk, { desc = "Undo stage hunk" })
         map('n', '<leader>hR', gs.reset_buffer, { desc = "Reset buffer" })
