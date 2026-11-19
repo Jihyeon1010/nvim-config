@@ -1,5 +1,6 @@
-local g = vim.g               -- Global variables
-local opt = vim.opt           -- Set options (global/buffer/windows-scoped)
+local g = vim.g     -- Global variables
+local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+
 -- General
 opt.mouse = 'a'               -- Enable mouse support
 opt.clipboard = 'unnamedplus' -- Copy/paste to system clipboard
@@ -18,6 +19,7 @@ opt.splitbelow = true
 opt.termguicolors = true
 opt.hlsearch = true
 opt.incsearch = true
+
 -- Tabs, indent
 opt.expandtab = true   -- Use spaces instead of tabs
 opt.shiftwidth = 2     -- Shift 2 spaces when tab

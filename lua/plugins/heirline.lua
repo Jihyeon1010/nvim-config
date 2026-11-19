@@ -405,6 +405,7 @@ return {
         provider = separators.soft_left,
         hl = { fg = colors.blue, bg = colors.bg_statusline },
       }
+
       -- WINBAR COMPONENTS
       local WinBarFileName = {
         provider = function()
